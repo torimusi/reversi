@@ -1,9 +1,10 @@
 const stage = document.getElementById("stage");
 const squareTemplate = document.getElementById("square-template");
 const stoneStateList = [];
+const currentTurnText = document.getElementById("current-turn");
+let currentColor = 1;
 
 /* 反転可能な石の番号を返す */ 
-let currentColor = 1;
 const getReversibleStones = (idx) => {
 
     // クリックしたマスから見て、周囲8方向にマスがいくつあるかあらかじめ計算する
@@ -53,7 +54,7 @@ const getReversibleStones = (idx) => {
             // さらに隣にある石が相手の色か
             if (targetColor === currentColor) {
                 // 自分の色なら仮ボックスの石が反転可能であることが確定
-                results - results.concat(box);
+                results = results.concat(box);
                 break;
             } else {
                 // 相手の色なら仮ボックスにその石の番号を格納
@@ -69,9 +70,55 @@ const getReversibleStones = (idx) => {
 /* マスをクリックした時 */
 const onClickSquare = (index) => {
     // console.log(index)
+
+    // 他の石がある場合にアラートを出す
     if (stoneStateList[index] !== 0) {
         alert("すでに石が置かれています");
         return;
+    }
+
+    // 置いた時に反転可能な石がない場合にアラートを出す
+    const reversibleStones = getReversibleStones(index);
+    if (!reversibleStones.length) {
+        alert("反転可能な石がありません");
+        return;
+    }
+
+    // 自分の石を置く
+    stoneStateList[index] = currentColor;
+    document
+        .querySelector(`[data-index='${index}']`)
+        .setAttribute("data-state", currentColor);
+
+    // 相手の石を反転する（現在のターンの色に変更する）
+    reversibleStones.forEach((key) => {
+        stoneStateList[key] = currentColor;
+        document.querySelector(`[data-index='${key}']`).setAttribute("data-state", currentColor);
+    });
+
+    // 盤面が埋まっている場合、石の数を集計してゲームを終了する
+    if (stoneStateList.every((state) => state !== 0)) {
+        const blackStonesNum = stoneStateList.filter(state => state === 1).length;
+        const whiteStonesNum = 64 - blackStonesNum;
+
+        let winnerText = "";
+        if (blackStonesNum > whiteStonesNum) {
+            winnerText = "黒の勝ちです";
+        } else if (blackStonesNum < whiteStonesNum) {
+            winnerText = "白の勝ちです";
+        } else {
+            winnerText = "引き分けです";
+        }
+
+        alert(`ゲーム終了です。白${whiteStonesNum}、黒${blackStonesNum}で、${winnerText}。`)
+    }
+
+    // ゲーム続行なら相手のターンにする
+    currentColor = 3 - currentColor;
+    if (currentColor === 1) {
+        currentTurnText.textContent = "黒";
+    } else {
+        currentTurnText.textContent = "白";
     }
 }
 
