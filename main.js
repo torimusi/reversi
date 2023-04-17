@@ -2,7 +2,19 @@ const stage = document.getElementById("stage");
 const squareTemplate = document.getElementById("square-template");
 const stoneStateList = [];
 const currentTurnText = document.getElementById("current-turn");
+const passButton = document.getElementById("pass");
 let currentColor = 1;
+
+/* 手番を渡す */
+const changeTurn = () => {
+    currentColor = 3 - currentColor;
+
+    if (currentColor === 1) {
+        currentTurnText.textContent = "黒";
+    } else {
+        currentTurnText.textContent = "白";
+    }
+}
 
 /* 反転可能な石の番号を返す */ 
 const getReversibleStones = (idx) => {
@@ -114,12 +126,7 @@ const onClickSquare = (index) => {
     }
 
     // ゲーム続行なら相手のターンにする
-    currentColor = 3 - currentColor;
-    if (currentColor === 1) {
-        currentTurnText.textContent = "黒";
-    } else {
-        currentTurnText.textContent = "白";
-    }
+    changeTurn();
 }
 
 /* 初期盤面を表示 */ 
@@ -154,4 +161,6 @@ const createSquares = () => {
 
 window.onload = () => {
     createSquares();
+
+    passButton.addEventListener("click", changeTurn);
 };
