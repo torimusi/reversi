@@ -108,6 +108,13 @@ const onClickSquare = (index) => {
         document.querySelector(`[data-index='${key}']`).setAttribute("data-state", currentColor);
     });
 
+    // 石の色がどちらかのみの場合、ゲームを終了する
+    if (stoneStateList.every((state) => state !== 1)) {
+        alert(`白の勝ちです`);
+    } else if (stoneStateList.every((state) => state !== 2)) {
+        alert(`黒の勝ちです`);
+    }
+
     // 盤面が埋まっている場合、石の数を集計してゲームを終了する
     if (stoneStateList.every((state) => state !== 0)) {
         const blackStonesNum = stoneStateList.filter(state => state === 1).length;
